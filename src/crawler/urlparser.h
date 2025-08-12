@@ -40,6 +40,8 @@ private:
     static std::string toLowerCase(const std::string& str);
     static std::vector<std::string> splitPath(const std::string& path);
     static std::string joinPath(const std::vector<std::string>& segments);
+    static std::string normalize(const std::string& url, bool removeFragment = false);
+    static std::string isValidUrl(const std::string& url, bool removeFragment = false);
 
     static const std::regex URL_REGEX;
 
