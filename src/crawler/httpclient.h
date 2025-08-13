@@ -41,9 +41,9 @@ private:
     HttpConfig config_;
     void* curlHandle_ = nullptr;
 
-    HttpResponse performRequest(const std::string& url, const std::string& method) const;
+    [[nodiscard]] HttpResponse performRequest(const std::string& url, const std::string& method) const;
     static size_t writeCallback(void* contents, size_t size, size_t nmemb, std::string* response);
     static size_t headerCallback(void* contents, size_t size, size_t nmemb, std::map<std::string, std::string>* headers);
 };
 
-//Lesson learned, Capitlization is important in C++, fuck this language. Also employeers if you are seeing this, this is problem solving!
+//Lesson learned, capitlization is important in C++, fuck this language. Also employeers if you are seeing this, this is problem solving!
