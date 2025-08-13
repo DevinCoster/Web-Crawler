@@ -62,9 +62,9 @@ A high-performance, multi-threaded web crawler built in C++17 with advanced grap
                                  │
         ┌────────────────────────┼────────────────────────┐
         │                        │                        │
-┌───────▼────────┐     ┌─────────▼────────┐    ┌─────────▼────────┐
-│   URL Queue    │     │   HTTP Client    │    │   HTML Parser    │
-│ - Thread-safe  │     │ - GET requests   │    │ - Extract links  │
-│ - BFS ordering │     │ - Handle errors  │    │ - Clean HTML     │
-│ - Deduplication│     │ - Respect robots │    │ - Follow rules   │
-└────────────────┘     └──────────────────┘    └──────────────────┘
+┌───────▼────────┐     ┌─────────▼────────┐     ┌─────────▼────────┐
+│   URL Queue    │     │   HTTP Client    │     │   HTML Parser    │
+│ - Thread-safe  │     │ - GET requests   │     │ - Extract links  │
+│ - BFS ordering │     │ - Handle errors  │     │ - Clean HTML     │
+│ - Deduplication│     │ - Respect robots │     │ - Follow rules   │
+└────────────────┘     └──────────────────┘     └──────────────────┘
