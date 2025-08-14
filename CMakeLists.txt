@@ -1,10 +1,15 @@
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.10)
 project(WebCrawler)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(CURL REQUIRED libcurl)
+# Set vcpkg toolchain if not already set
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            CACHE STRING "Vcpkg toolchain file")
+endif()
+
+find_package(CURL REQUIRED)
 
 add_executable(WebCrawler src/main.cpp
         src/crawler/urlparser.cpp
@@ -13,5 +18,4 @@ add_executable(WebCrawler src/main.cpp
         src/crawler/httpclient.h
         src/crawler/config/crawlerconfig.h)
 
-target_link_libraries(WebCrawler ${CURL_LIBRARIES})
-target_include_directories(WebCrawler PRIVATE ${CURL_INCLUDE_DIRS})
+target_link_libraries(WebCrawler CURL::libcurl)

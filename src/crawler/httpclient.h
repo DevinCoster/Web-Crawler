@@ -31,7 +31,7 @@ public:
     };
 
     HttpClient();  // Default constructor
-    explicit HttpClient(const HttpConfig& config);  // Constructor with config
+    explicit HttpClient(HttpConfig  config);  // Constructor with config
     ~HttpClient();
 
     [[nodiscard]] HttpResponse get(const std::string& url) const;
