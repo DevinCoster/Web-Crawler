@@ -1,6 +1,6 @@
 # Multi-threaded Web Crawler
 
-A high-performance, multi-threaded web crawler built in C++17 with advanced graph analysis capabilities. This project demonstrates systems programming, concurrency, and algorithm implementation skills.
+A high-performance, multi-threaded web crawler built in C++ with advanced graph analysis capabilities. This project demonstrates systems programming, concurrency, and algorithm implementation skills.
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)]()
