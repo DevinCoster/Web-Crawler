@@ -11,7 +11,9 @@
 #include <unordered_set>
 #include <vector>
 #include <functional>
-#include <regex>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 class WebCrawler {
 public:
@@ -36,6 +38,9 @@ public:
     size_t getQueueSize() const;
     size_t getVisitedCount() const;
 
+    void setThreadCount(size_t threads) { numThreads_ = threads; }
+    void startMultiThreaded();
+
 private:
     CrawlerConfig config_;
     HttpClient httpClient_;
@@ -50,4 +55,10 @@ private:
     static std::vector<std::string> extractLinks(const std::string& html, const std::string& baseUrl);
     bool shouldCrawlUrl(const std::string& url) const;
     void processUrl(const std::string& url);
+
+    size_t numThreads_ = 4;
+    std::vector<std::thread> workers_;
+    std::mutex queueMutex_;
+    std::mutex visitedMutex_;
+    std::condition_variable cv_;
 };
