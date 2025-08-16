@@ -14,7 +14,7 @@ HttpClient::HttpClient() : config_{}, curlHandle_(nullptr)
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curlHandle_ = curl_easy_init();
     if (!curlHandle_) {
-        throw std::runtime_error("Failed to initializ CURL");
+        throw std::runtime_error("Failed to initialize CURL");
     }
 }
 
@@ -24,7 +24,7 @@ HttpClient::HttpClient(HttpConfig  config) : config_(std::move(config)), curlHan
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curlHandle_ = curl_easy_init();
     if (!curlHandle_) {
-        throw std::runtime_error("Failed to initializ CURL");
+        throw std::runtime_error("Failed to initialize CURL");
     }
 }
 
@@ -34,7 +34,7 @@ HttpClient::~HttpClient()
     if (curlHandle_) {
         curl_easy_cleanup(curlHandle_);
     }
-    curl_global_cleanup();
+    // curl_global_cleanup();  // Removed redundant cleanup
 }
 
 // The GET Request
@@ -61,13 +61,11 @@ HttpClient::HttpResponse HttpClient::performRequest(const std::string& url, cons
         return response;
     }
 
-    std::string responseBody;  // Changed from requestBody
+    std::string responseBody;
     std::map<std::string, std::string> responseHeaders;
 
-    // Reset CURL handle
     curl_easy_reset(static_cast<CURL*>(curlHandle_));
 
-    // Set basic options - FIXED CASTING
     curl_easy_setopt(static_cast<CURL*>(curlHandle_), CURLOPT_URL, url.c_str());
     curl_easy_setopt(static_cast<CURL*>(curlHandle_), CURLOPT_USERAGENT, config_.userAgent.c_str());
     curl_easy_setopt(static_cast<CURL*>(curlHandle_), CURLOPT_TIMEOUT, static_cast<long>(config_.timeout.count()));
@@ -75,19 +73,16 @@ HttpClient::HttpResponse HttpClient::performRequest(const std::string& url, cons
     curl_easy_setopt(static_cast<CURL*>(curlHandle_), CURLOPT_MAXREDIRS, static_cast<long>(config_.maxRedirects));
     curl_easy_setopt(static_cast<CURL*>(curlHandle_), CURLOPT_MAXFILESIZE, static_cast<long>(config_.maxContentLength));
 
-    // Set method
     if (method == "HEAD")
     {
         curl_easy_setopt(static_cast<CURL*>(curlHandle_), CURLOPT_NOBODY, 1L);
     }
 
-    // Set callbacks - FIXED CASTING
     curl_easy_setopt(static_cast<CURL*>(curlHandle_), CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(static_cast<CURL*>(curlHandle_), CURLOPT_WRITEDATA, &responseBody);
     curl_easy_setopt(static_cast<CURL*>(curlHandle_), CURLOPT_HEADERFUNCTION, headerCallback);
     curl_easy_setopt(static_cast<CURL*>(curlHandle_), CURLOPT_HEADERDATA, &responseHeaders);
 
-    // Perform the request
     CURLcode res = curl_easy_perform(static_cast<CURL*>(curlHandle_));
 
     if (res != CURLE_OK)
@@ -97,13 +92,11 @@ HttpClient::HttpResponse HttpClient::performRequest(const std::string& url, cons
         return response;
     }
 
-    // Get the response code - FIXED TYPE
     long responseCode;
     curl_easy_getinfo(static_cast<CURL*>(curlHandle_), CURLINFO_RESPONSE_CODE, &responseCode);
 
-    // Set response details
     response.statusCode = static_cast<int>(responseCode);
-    response.body = std::move(responseBody);  // Fixed variable name
+    response.body = std::move(responseBody);
     response.headers = std::move(responseHeaders);
     response.success = true;
 
@@ -129,7 +122,6 @@ size_t HttpClient::headerCallback(void* contents, size_t size, size_t nmemb, std
         std::string name = header.substr(0, colonPos);
         std::string value = header.substr(colonPos + 1);
 
-        // FIXED trimming - add missing characters in find_last_not_of
         name.erase(0, name.find_first_not_of(" \t"));
         name.erase(name.find_last_not_of(" \t\r\n") + 1);  // Added \r\n
         value.erase(0, value.find_first_not_of(" \t"));
