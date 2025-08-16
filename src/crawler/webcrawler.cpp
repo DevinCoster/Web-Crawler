@@ -156,3 +156,53 @@ size_t WebCrawler::getQueueSize() const {
 size_t WebCrawler::getVisitedCount() const {
     return visitedUrls_.size();
 }
+
+void WebCrawler::startMultiThreaded() {
+    running_ = true;
+
+    // Add seed URLs to queue
+    for (const auto& seedUrl : config_.seedUrls) {
+        urlQueue_.push(seedUrl);
+    }
+
+    std::cout << "Starting multi-threaded crawl with " << numThreads_ << " threads\n";
+
+    // Create worker threads
+    for (size_t i = 0; i < numThreads_; ++i) {
+        workers_.emplace_back([this]() {
+            while (running_) {
+                std::string currentUrl;
+
+                {
+                    std::unique_lock<std::mutex> lock(queueMutex_);
+                    cv_.wait(lock, [this] { return !urlQueue_.empty() || !running_; });
+
+                    if (!running_ || urlQueue_.empty()) break;
+
+                    {
+                        std::lock_guard<std::mutex> visitedLock(visitedMutex_);
+                        if (visitedUrls_.size() >= config_.maxPages) break;
+                    }
+
+                    currentUrl = urlQueue_.front();
+                    urlQueue_.pop();
+                }
+
+                processUrl(currentUrl);
+
+                if (config_.delayBetweenRequests.count() > 0) {
+                    std::this_thread::sleep_for(config_.delayBetweenRequests);
+                }
+            }
+        });
+    }
+
+    // Wait for all threads to complete
+    for (auto& worker : workers_) {
+        if (worker.joinable()) {
+            worker.join();
+        }
+    }
+
+    std::cout << "Multi-threaded crawl completed. Visited " << visitedUrls_.size() << " pages\n";
+}
